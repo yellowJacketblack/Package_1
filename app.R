@@ -295,7 +295,8 @@ server <- function(input, output, session) {
         cols = c(hunt, new_world, ark, smash, rust),
         names_to = "term",
         values_to = "interest"
-      )
+      ) %>%
+      mutate(term = gsub("_", " ", term))
     
     ggplot(df, aes(x = date, y = interest, color = term)) +
       geom_line(linewidth = 1) +
