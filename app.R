@@ -251,14 +251,15 @@ server <- function(input, output, session) {
     dat <- data_cache()
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
-    vals <- dat$timeline[[term]]
+    vals <- dat$timeline[[term_col]]
     sprintf("Average Interest: %.2f", mean(vals, na.rm = TRUE))
   })
   
   output$peak_interest_display <- renderText({
     dat <- data_cache()
     term <- input$term_select
-    vals <- dat$timeline[[term]]
+    term_col <- gsub(" ", "_", term)
+    vals <- dat$timeline[[term_col]]
     peak_day <- dat$timeline$date[which.max(vals)]
     sprintf("Peak Interest: %s on %s", max(vals, na.rm = TRUE), peak_day)
   })
@@ -267,8 +268,9 @@ server <- function(input, output, session) {
   output$timeline_chart <- renderPlot({
     dat <- data_cache()
     term <- input$term_select
+    term_col <- gsub(" ", "_", term)
     df <- dat$timeline %>%
-      select(date, value = all_of(term))
+      select(date, value = all_of(term_col))
     
     ggplot(df, aes(x = date, y = value)) +
       geom_line(color = "#829FC1", linewidth = 1) +
@@ -328,7 +330,8 @@ server <- function(input, output, session) {
   output$regional_chart <- renderPlot({
     dat <- data_cache()
     term <- input$term_select
-    col_name <- paste0(term, "_pct")
+    term_col <- gsub(" ", "_", term)
+    col_name <- paste0(term_col, "_pct")
     
     df <- dat$geo_combined %>%
       select(region, value = all_of(col_name)) %>%
@@ -393,7 +396,8 @@ server <- function(input, output, session) {
   output$interest_stats <- renderPrint({
     dat <- data_cache()
     term <- input$term_select
-    vals <- dat$timeline[[term]]
+    term_col <- gsub(" ", "_", term)
+    vals <- dat$timeline[[term_col]]
     
     mean_val <- mean(vals, na.rm = TRUE)
     median_val <- median(vals, na.rm = TRUE)
@@ -416,9 +420,10 @@ server <- function(input, output, session) {
   output$daily_stats_table <- renderTable({
     dat <- data_cache()
     term <- input$term_select
+    term_col <- gsub(" ", "_", term)
     
     dat$timeline %>%
-      select(date, value = all_of(term)) %>%
+      select(date, value = all_of(term_col)) %>%
       mutate(
         day_name = wday(date, label = TRUE),
         formatted_date = paste(format(date, "%A"), format(date, "%Y-%m-%d"))
