@@ -10,25 +10,6 @@ library(tidyr)
 library(wordcloud2)
 library(readr)
 
-rsconnect::deployApp(
-  appDir = "~/Fiverr/dummy apps/Package 1",
-  appFiles = c(
-    "packageOne.R",
-    "multiTimeline-10.csv",
-    "geoMap-2.csv", "geoMap-3.csv", "geoMap-4.csv",
-    "geoMap-5.csv", "geoMap-6.csv", "geoMap-7.csv",
-    "relatedQueries-36.csv", "relatedQueries-37.csv",
-    "relatedQueries-38.csv", "relatedQueries-39.csv",
-    "relatedQueries-40.csv"
-  ),
-  appPrimaryDoc = "packageOne.R",
-  appMode = "shiny",
-  account = "jalisa",
-  server = "connect.posit.cloud",
-  appName = "package_1_v2",
-  appTitle = "Package 1 v2",
-  lint = FALSE
-)
 # ------------------------------------------------------------
 # Ensure correct working directory
 # ------------------------------------------------------------
