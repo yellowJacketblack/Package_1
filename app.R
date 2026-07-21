@@ -164,15 +164,15 @@ ui <- fluidPage(
   fluidRow(
     column(4,
            h4("Total Data Points"),
-           textOutput("total_points_display")
+           uiOutput("total_points_display")
     ),
     column(4,
            h4("Average Search Interest"),
-           textOutput("avg_interest_display")
+           uiOutput("avg_interest_display")
     ),
     column(4,
            h4("Peak Search Interest"),
-           textOutput("peak_interest_display")
+           uiOutput("peak_interest_display")
     )
   ),
   hr(),
@@ -239,23 +239,26 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   
   # ---- Key metrics ----------------------------------------------------
-  output$total_points_display <- renderText({
-    sprintf("Total Data Points: %s days", nrow(app_data$timeline))
+  output$total_points_display <- renderUI({
+    HTML(paste0("<div style='font-size:18px; font-weight:bold; color:#333; padding:8px;'>",
+    "Total Data Points: ", nrow(app_data$timeline), " days</div>"))
   })
   
-  output$avg_interest_display <- renderText({
+  output$avg_interest_display <- renderUI({
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
     vals <- app_data$timeline[[term_col]]
-    sprintf("Average Interest: %.2f", mean(vals, na.rm = TRUE))
+    HTML(paste0("<div style='font-size:18px; font-weight:bold; color:#333; padding:8px;'>",
+                "Average Interest: ", sprintf("%.2f", mean(vals, na.rm = TRUE)), "</div>"))
   })
   
-  output$peak_interest_display <- renderText({
+  output$peak_interest_display <- renderUI({
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
     vals <- app_data$timeline[[term_col]]
     peak_day <- app_data$timeline$date[which.max(vals)]
-    sprintf("Peak Interest: %s on %s", max(vals, na.rm = TRUE), peak_day)
+    HTML(paste0("<div style='font-size:18px; font-weight:bold; color:#333; padding:8px;'>",
+                "Peak Interest: ", max(vals, na.rm = TRUE), " on ", peak_day, "</div>"))
   })
   
   # ---- Chart 1: Timeline for selected term ----------------------------
