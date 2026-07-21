@@ -164,15 +164,15 @@ ui <- fluidPage(
   fluidRow(
     column(4,
            h4("Total Data Points"),
-           verbatimTextOutput("total_points_display")
+           textOutput("total_points_display")
     ),
     column(4,
            h4("Average Search Interest"),
-           verbatimTextOutput("avg_interest_display")
+           textOutput("avg_interest_display")
     ),
     column(4,
            h4("Peak Search Interest"),
-           verbatimTextOutput("peak_interest_display")
+           textOutput("peak_interest_display")
     )
   ),
   hr(),
