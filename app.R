@@ -275,7 +275,6 @@ server <- function(input, output, session) {
     ggplot(df, aes(x = date, y = value)) +
       geom_line(color = "#829FC1", linewidth = 1) +
       geom_point(size = 2, color = "#829FC1") +
-      geom_smooth(method = "loess", se = FALSE, color = "#050E1C", linetype = "dashed") +
       labs(
         title = paste("Search Interest Over Time:", term),
         subtitle = "Relative search interest (0-100 scale)",
