@@ -250,6 +250,7 @@ server <- function(input, output, session) {
   output$avg_interest_display <- renderText({
     dat <- data_cache()
     term <- input$term_select
+    term_col <- gsub(" ", "_", term)
     vals <- dat$timeline[[term]]
     sprintf("Average Interest: %.2f", mean(vals, na.rm = TRUE))
   })
