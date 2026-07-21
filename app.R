@@ -130,6 +130,8 @@ load_data <- function() {
   )
 }
 
+# Load data once globally when the server starts
+app_data <- load_data()
 # ------------------------------------------------------------
 # Small helper - mode
 # ------------------------------------------------------------
@@ -202,7 +204,7 @@ ui <- fluidPage(
   hr(),
   
   # ---- Tag word cloud ------------------------------------------------
-  h3("Most Frequent Related Queries (All Terms)"),
+  h3("Most Frequent Related Queries (Selected Term)"),
   wordcloud2Output("query_cloud"),
   hr(),
   
@@ -236,40 +238,31 @@ ui <- fluidPage(
 # ------------------------------------------------------------
 server <- function(input, output, session) {
   
-  # Load data once
-  data_cache <- reactive({
-    load_data()
-  })
-  
   # ---- Key metrics ----------------------------------------------------
   output$total_points_display <- renderText({
-    dat <- data_cache()
-    sprintf("Total Data Points: %s days", nrow(dat$timeline))
+    sprintf("Total Data Points: %s days", nrow(app_data$timeline))
   })
   
   output$avg_interest_display <- renderText({
-    dat <- data_cache()
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
-    vals <- dat$timeline[[term_col]]
+    vals <- app_data$timeline[[term_col]]
     sprintf("Average Interest: %.2f", mean(vals, na.rm = TRUE))
   })
   
   output$peak_interest_display <- renderText({
-    dat <- data_cache()
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
-    vals <- dat$timeline[[term_col]]
-    peak_day <- dat$timeline$date[which.max(vals)]
+    vals <- app_data$timeline[[term_col]]
+    peak_day <- app_data$timeline$date[which.max(vals)]
     sprintf("Peak Interest: %s on %s", max(vals, na.rm = TRUE), peak_day)
   })
   
   # ---- Chart 1: Timeline for selected term ----------------------------
   output$timeline_chart <- renderPlot({
-    dat <- data_cache()
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
-    df <- dat$timeline %>%
+    df <- app_data$timeline %>%
       select(date, value = all_of(term_col))
     
     ggplot(df, aes(x = date, y = value)) +
@@ -286,12 +279,11 @@ server <- function(input, output, session) {
         plot.subtitle = element_text(size = 10),
         axis.text.x = element_text(angle = 45, hjust = 1)
       )
-  })
+  }) %>% bindCache(input$term_select)
   
   # ---- Chart 2: All terms comparison ---------------------------------
   output$comparison_chart <- renderPlot({
-    dat <- data_cache()
-    df <- dat$timeline %>%
+    df <- app_data$timeline %>%
       pivot_longer(
         cols = c(hunt, new_world, ark, smash, rust),
         names_to = "term",
@@ -323,16 +315,15 @@ server <- function(input, output, session) {
         plot.subtitle = element_text(size = 10),
         axis.text.x = element_text(angle = 45, hjust = 1)
       )
-  })
+  }) %>% bindCache() # Cache this permanently since it never changes
   
   # ---- Chart 3: Regional bar chart ------------------------------------
   output$regional_chart <- renderPlot({
-    dat <- data_cache()
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
     col_name <- paste0(term_col, "_pct")
     
-    df <- dat$geo_combined %>%
+    df <- app_data$geo_combined %>%
       select(region, value = all_of(col_name)) %>%
       arrange(desc(value)) %>%
       head(20)
@@ -350,22 +341,20 @@ server <- function(input, output, session) {
         plot.title = element_text(face = "bold", size = 14),
         plot.subtitle = element_text(size = 10)
       )
-  })
+  }) %>% bindCache(input$term_select)
   
   # ---- Related queries tables -----------------------------------------
   output$top_queries_table <- renderTable({
-    dat <- data_cache()
     term <- input$term_select
-    dat$related_all %>%
+    app_data$related_all %>%
       filter(term == !!term, type == "TOP") %>%
       select(Query = query, Value = value) %>%
       head(25)
   }, striped = TRUE, hover = TRUE, bordered = TRUE)
   
   output$rising_queries_table <- renderTable({
-    dat <- data_cache()
     term <- input$term_select
-    dat$related_all %>%
+    app_data$related_all %>%
       filter(term == !!term, type == "RISING") %>%
       select(Query = query, Growth = value) %>%
       head(25)
@@ -373,12 +362,21 @@ server <- function(input, output, session) {
   
   # ---- Word cloud -----------------------------------------------------
   output$query_cloud <- renderWordcloud2({
-    dat <- data_cache()
-    if (is.null(dat$wc_data) || nrow(dat$wc_data) == 0) {
+    term <- input$term_select
+    
+    # Filter top queries for ONLY the selected term
+    term_wc_data <- app_data$top_queries %>%
+      filter(term == !!term) %>%
+      group_by(query) %>%
+      summarise(freq = sum(value_num), .groups = "drop") %>%
+      arrange(desc(freq)) %>%
+      as.data.frame()
+    
+    if (is.null(term_wc_data) || nrow(term_wc_data) == 0) {
       return(wordcloud2(data.frame(word = "", freq = 0), size = 0))
     }
     wordcloud2(
-      data = dat$wc_data,
+      data = term_wc_data,
       size = 1.4,
       minSize = 0,
       gridSize = 0.5,
@@ -389,14 +387,13 @@ server <- function(input, output, session) {
       shape = "circle",
       fontFamily = "sans"
     )
-  })
+  })  %>% bindCache(input$term_select)
   
   # ---- Basic Statistics -----------------------------------------------
   output$interest_stats <- renderPrint({
-    dat <- data_cache()
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
-    vals <- dat$timeline[[term_col]]
+    vals <- app_data$timeline[[term_col]]
     
     mean_val <- mean(vals, na.rm = TRUE)
     median_val <- median(vals, na.rm = TRUE)
@@ -417,11 +414,10 @@ server <- function(input, output, session) {
   
   # ---- Daily stats table ----------------------------------------------
   output$daily_stats_table <- renderTable({
-    dat <- data_cache()
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
     
-    dat$timeline %>%
+    app_data$timeline %>%
       select(date, value = all_of(term_col)) %>%
       mutate(
         day_name = wday(date, label = TRUE),
@@ -438,8 +434,7 @@ server <- function(input, output, session) {
   
   # ---- Regional comparison table --------------------------------------
   output$regional_comparison_table <- renderTable({
-    dat <- data_cache()
-    dat$geo_combined %>%
+    app_data$geo_combined %>%
       arrange(desc(hunt_pct)) %>%
       select(
         `State` = region,
