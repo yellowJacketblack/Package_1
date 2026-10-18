@@ -291,11 +291,7 @@ server <- function(input, output, session) {
   # ---- Chart 2: All terms comparison ---------------------------------
   output$comparison_chart <- renderPlot({
     df <- app_data$timeline %>%
-      pivot_longer(
-        cols = c(hunt, new_world, ark, smash, rust),
-        names_to = "term",
-        values_to = "interest"
-      ) %>%
+      pivot_longer(cols = -date, names_to = "term", values_to = "interest") %>%
       mutate(term = gsub("_", " ", term))
     
     ggplot(df, aes(x = date, y = interest, color = term)) +
