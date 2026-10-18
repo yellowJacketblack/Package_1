@@ -43,7 +43,7 @@ load_data <- function() {
     mutate(date = as.Date(date))
   
   # Regional combined data (geoMap-2.csv)
-  geo_combined <- read_csv('geoMap-2.csv', skip = 2) %>%
+  geo_combined <- read_csv('geoMap-2.csv', skip = 1) %>%
     rename(
       region = Region,
       hunt_pct = `hunt: (4/20/26 - 7/20/26)`,
@@ -55,11 +55,11 @@ load_data <- function() {
     mutate(across(ends_with("_pct"), ~ as.numeric(gsub("%", "", .)) / 100))
   
   # Individual geo maps
-  geo_hunt <- read_csv('geoMap-7.csv', skip = 2) %>% mutate(term = "hunt")
-  geo_new_world <- read_csv('geoMap-6.csv', skip = 2) %>% mutate(term = "new world")
-  geo_ark <- read_csv('geoMap-5.csv', skip = 2) %>% mutate(term = "ark")
-  geo_smash <- read_csv('geoMap-4.csv', skip = 2) %>% mutate(term = "smash")
-  geo_rust <- read_csv('geoMap-3.csv', skip = 2) %>% mutate(term = "rust")
+  geo_hunt <- read_csv('geoMap-7.csv', skip = 1) %>% mutate(term = "hunt")
+  geo_new_world <- read_csv('geoMap-6.csv', skip = 1) %>% mutate(term = "new world")
+  geo_ark <- read_csv('geoMap-5.csv', skip = 1) %>% mutate(term = "ark")
+  geo_smash <- read_csv('geoMap-4.csv', skip = 1) %>% mutate(term = "smash")
+  geo_rust <- read_csv('geoMap-3.csv', skip = 1) %>% mutate(term = "rust")
   
   geo_all <- bind_rows(
     geo_hunt, geo_new_world, geo_ark, geo_smash, geo_rust
