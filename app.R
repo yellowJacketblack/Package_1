@@ -31,7 +31,7 @@ if (interactive()) {
 # ------------------------------------------------------------
 load_data <- function() {
   # Time series data (multiTimeline-10.csv)
-  timeline <- read_csv('multiTimeline-10.csv', skip = 2) %>%
+  timeline <- read_csv('multiTimeline-10.csv', skip = 1) %>%
     rename(
       date = Day,
       hunt = `hunt: (United States)`,
