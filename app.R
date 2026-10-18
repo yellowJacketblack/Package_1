@@ -9,6 +9,7 @@ library(lubridate)
 library(tidyr)
 library(wordcloud2)
 library(readr)
+library(rstudioapi)
 
 # ------------------------------------------------------------
 # Ensure correct working directory
