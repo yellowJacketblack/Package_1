@@ -77,22 +77,25 @@ load_data <- function() {
     rising_lines <- lines[(rising_idx + 1):length(lines)]
     
     parse_block <- function(block_lines, type) {
-      result <- data.frame()
-      for (line in block_lines) {
-        if (nchar(trimws(line)) == 0) next
-        parts <- strsplit(line, ",")[[1]]
-        query <- parts[1]
-        value <- parts[length(parts)]
-        result <- rbind(result, data.frame(
-          term = term_name,
-          type = type,
-          query = query,
-          value = value,
-          stringsAsFactors = FALSE
-        ))
-      }
-      result
-    }
+  result <- data.frame()
+  for (line in block_lines) {
+    if (nchar(trimws(line)) == 0) next
+    
+    comma_pos <- regexpr(',', line)
+    query     <- trimws(substr(line, 1, comma_pos - 1))
+    value     <- trimws(substr(line, comma_pos + 1, nchar(line)))
+    value     <- gsub('^"|"$', '', value)
+    
+    result <- rbind(result, data.frame(
+      term = term_name,
+      type = type,
+      query = query,
+      value = value,
+      stringsAsFactors = FALSE
+    ))
+  }
+  result
+}
     
     top_df <- parse_block(top_lines, "TOP")
     rising_df <- parse_block(rising_lines, "RISING")
