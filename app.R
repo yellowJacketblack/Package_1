@@ -373,6 +373,7 @@ server <- function(input, output, session) {
       group_by(query) %>%
       summarise(freq = sum(value_num), .groups = "drop") %>%
       arrange(desc(freq)) %>%
+      rename(word = query)
       as.data.frame()
     
     if (is.null(term_wc_data) || nrow(term_wc_data) == 0) {
