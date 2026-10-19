@@ -441,7 +441,7 @@ server <- function(input, output, session) {
     term_col <- paste0(gsub(" ", "_", input$term_select), "_pct")
 
     app_data$geo_combined %>%
-      arrange(.data[[term_col]])) %>%
+      arrange(.data[[term_col]])} %>%
       select(
         `State` = region,
         `Hunt %` = hunt_pct,
