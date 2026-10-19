@@ -438,8 +438,10 @@ server <- function(input, output, session) {
   
   # ---- Regional comparison table --------------------------------------
   output$regional_comparison_table <- renderTable({
+    term_col <- paste0(gsub(" ", "_", input$term_select), "_pct")
+
     app_data$geo_combined %>%
-      arrange(desc(hunt_pct)) %>%
+      arrange(.data[[term_col]])) %>%
       select(
         `State` = region,
         `Hunt %` = hunt_pct,
