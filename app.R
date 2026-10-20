@@ -286,7 +286,7 @@ server <- function(input, output, session) {
         plot.subtitle = element_text(size = 10),
         axis.text.x = element_text(angle = 45, hjust = 1)
       )
-  }) %>% bindCache(input$term_select)
+  })
   
   # ---- Chart 2: All terms comparison ---------------------------------
   output$comparison_chart <- renderPlot({
@@ -318,7 +318,7 @@ server <- function(input, output, session) {
         plot.subtitle = element_text(size = 10),
         axis.text.x = element_text(angle = 45, hjust = 1)
       )
-  }) %>% bindCache() # Cache this permanently since it never changes
+  })
   
   # ---- Chart 3: Regional bar chart ------------------------------------
   output$regional_chart <- renderPlot({
@@ -344,7 +344,7 @@ server <- function(input, output, session) {
         plot.title = element_text(face = "bold", size = 14),
         plot.subtitle = element_text(size = 10)
       )
-  }) %>% bindCache(input$term_select)
+  })
   
   # ---- Related queries tables -----------------------------------------
   output$top_queries_table <- renderTable({
@@ -391,7 +391,7 @@ server <- function(input, output, session) {
       shape = "circle",
       fontFamily = "sans"
     )
-  })  %>% bindCache(input$term_select)
+  })
   
   # ---- Basic Statistics -----------------------------------------------
   output$interest_stats <- renderPrint({
