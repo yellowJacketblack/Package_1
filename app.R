@@ -244,16 +244,20 @@ server <- function(input, output, session) {
   
   # ---- Key metrics ----------------------------------------------------
   output$total_points_display <- renderUI({
-    HTML(paste0("<div style='font-size:18px; font-weight:bold; color:#333; padding:8px;'>",
-                "Total Data Points: ", nrow(app_data$timeline), " days</div>"))
+    tags$div(
+      style = "font-size:18px; font-weight:bold; color:#333; padding:8px;",
+      "Total Data Points: ", nrow(app_data$timeline), " days"
+    )
   })
   
   output$avg_interest_display <- renderUI({
     term <- input$term_select
     term_col <- gsub(" ", "_", term)
     vals <- app_data$timeline[[term_col]]
-    HTML(paste0("<div style='font-size:18px; font-weight:bold; color:#333; padding:8px;'>",
-                "Average Interest: ", sprintf("%.2f", mean(vals, na.rm = TRUE)), "</div>"))
+    tags$div(
+      style = "font-size:18px; font-weight:bold; color:#333; padding:8px;",
+      "Average Interest: ", sprintf("%.2f", mean(vals, na.rm = TRUE))
+    )
   })
   
   output$peak_interest_display <- renderUI({
@@ -261,8 +265,11 @@ server <- function(input, output, session) {
     term_col <- gsub(" ", "_", term)
     vals <- app_data$timeline[[term_col]]
     peak_day <- app_data$timeline$date[which.max(vals)]
-    HTML(paste0("<div style='font-size:18px; font-weight:bold; color:#333; padding:8px;'>",
-                "Peak Interest: ", max(vals, na.rm = TRUE), " on ", peak_day, "</div>"))
+    tags$div(
+      style = "font-size:18px; font-weight:bold; color:#333; padding:8px;",
+      "Peak Interest: ", max(vals, na.rm = TRUE),
+      " on ", peak_day
+    )
   })
   
   # ---- Chart 1: Timeline for selected term ----------------------------
